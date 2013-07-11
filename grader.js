@@ -24,6 +24,7 @@ References:
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
+var rest = require('restler');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
 var URL_DEFAULT = "http://fierce-reaches-1073.herokuapp.com";
@@ -38,7 +39,16 @@ var assertFileExists = function(infile) {
 };
 
 var assertUrlExists = function(url) {
+    console.log("in assertUrlExists");
 
+	rest.get(URL_DEFAULT).on('complete', function(result) {
+	     if (result instanceof Error) {
+	     sys.puts('Error: ' + result.message);
+	     this.retry(5000); // try again after 5 sec
+	     } else {
+	     sys.puts(result);
+	      }
+	 });
 };
 
 var cheerioHtmlFile = function(htmlfile) {
@@ -70,8 +80,12 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-        .option('-u, --url <url>', 'URL for html', clone(url), URL_DEFAULT)
+        .option('-u, --url <url>', 'URL for html')
         .parse(process.argv);
+	
+	console.log("url was set %j", program.url);
+	console.log("file was set %j", program.file);
+	
     var checkJson = checkHtmlFile(program.file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
     console.log(outJson);
