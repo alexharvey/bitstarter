@@ -99,7 +99,7 @@ if(require.main == module) {
 	console.log("url was set %j", program.url);
 	console.log("file was set %j", program.file);
 	
-	rest.get(program.url).on('complete', response2console);
+//	rest.get(program.url).on('complete', response2console);
 	
     var checkJson = checkHtmlFile(program.file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
