@@ -76,6 +76,19 @@ var clone = function(fn) {
     return fn.bind({});
 };
 
+var buildfn = function() {
+    var response2console = function() {
+        if (result instanceof Error) {
+            console.error('Error: ' + util.format(response.message));
+        } else {
+            console.error("Wrote %s", csvfile);
+            fs.writeFileSync(htmlFile, result);
+			checkHtmlFile(htmlFile, checksfile);
+        }
+    };
+    return response2console;
+};
+
 if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
@@ -85,6 +98,8 @@ if(require.main == module) {
 	
 	console.log("url was set %j", program.url);
 	console.log("file was set %j", program.file);
+	
+	rest.get(program.url).on('complete', response2console);
 	
     var checkJson = checkHtmlFile(program.file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
